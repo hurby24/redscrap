@@ -1,14 +1,16 @@
 export interface QueuedRequest {
 	endpoint: string;
-	params: Record<string, unknown>;
 	label: string;
+	params?: Record<string, unknown>;
 	retries?: number;
 	metadata?: Record<string, unknown>;
 }
 
 export class RequestQueue {
 	private queue: QueuedRequest[] = [];
-	private activeRequests = 0;
+	private totalRequests = 0;
+	private successfulRequests = 0;
+	private failedRequests = 0;
 
 	constructor(
 		private maxRequests: number,
@@ -16,17 +18,24 @@ export class RequestQueue {
 	) {}
 
 	public enqueue(request: QueuedRequest): void {
+		if (this.totalRequests >= this.maxRequests) {
+			return;
+		}
 		this.queue.push(request);
+		this.totalRequests++;
 		this.processQueue();
 	}
 
 	private async processQueue(): Promise<void> {
-		while (this.queue.length > 0 && this.activeRequests < this.maxRequests) {
+		while (this.queue.length > 0 && this.totalRequests <= this.maxRequests) {
 			const request = this.queue.shift();
 			if (request) {
-				this.activeRequests++;
 				this.processFn(request)
+					.then(() => {
+						this.successfulRequests++;
+					})
 					.catch((error) => {
+						this.failedRequests++;
 						console.error(
 							`Error processing request (${request.label}):`,
 							error,
@@ -40,10 +49,25 @@ export class RequestQueue {
 						}
 					})
 					.finally(() => {
-						this.activeRequests--;
 						this.processQueue();
 					});
 			}
 		}
+	}
+
+	public waitUntilAllDone(): Promise<void> {
+		return new Promise((resolve) => {
+			const checkFinished = () => {
+				if (
+					this.queue.length === 0 &&
+					this.successfulRequests + this.failedRequests >= this.totalRequests
+				) {
+					resolve();
+				} else {
+					setTimeout(checkFinished, 100);
+				}
+			};
+			checkFinished();
+		});
 	}
 }

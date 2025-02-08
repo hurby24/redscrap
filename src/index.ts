@@ -1,8 +1,10 @@
 import { JobSearchAZScraper } from "./scrapers/jobsearchaz-scraper.ts";
 import { BossAZScraper } from "./scrapers/bossaz-scraper.ts";
+import { HelloJobAZScraper } from "./scrapers/hellojobaz-scraper.ts";
 import type { APIScraperOptions } from "./base/api-scraper.ts";
 import type { HTMLScraperOptions } from "./base/html-scraper.ts";
 import { ProxyConfiguration } from "crawlee";
+import sql from "./db/db.ts";
 
 const APIproxyConfiguration =
 	process.env.PROXY_URLS?.split(",").map((url) => {
@@ -23,7 +25,7 @@ const HTMLproxyConfiguration = new ProxyConfiguration({
 });
 
 //jobsearch.az
-const ApiOptions: APIScraperOptions = {
+let ApiOptions: APIScraperOptions = {
 	baseUrl: "https://www.jobsearch.az/api-en",
 	headers: {
 		"X-Requested-With": " XMLHttpRequest",
@@ -39,7 +41,7 @@ await JobSearchscraper.start();
 await JobSearchscraper.saveJobs();
 
 //boss.az
-const HtmlOptions: HTMLScraperOptions = {
+let HtmlOptions: HTMLScraperOptions = {
 	startUrls: ["https://en.boss.az/vacancies"],
 	proxyConfiguration: HTMLproxyConfiguration,
 	maxRequestsPerCrawl: 50,
@@ -49,3 +51,18 @@ const HtmlOptions: HTMLScraperOptions = {
 const BossAZscraper = new BossAZScraper(HtmlOptions);
 await BossAZscraper.start();
 await BossAZscraper.saveJobs();
+
+//hellojob.az
+HtmlOptions = {
+	startUrls: ["https://www.hellojob.az/vakansiyalar"],
+	proxyConfiguration: HTMLproxyConfiguration,
+	maxRequestsPerCrawl: 50,
+	maxPages: 2,
+};
+
+const HelloJobscraper = new HelloJobAZScraper(HtmlOptions);
+await HelloJobscraper.start();
+await HelloJobscraper.saveJobs();
+
+//close db connection
+await sql.end();

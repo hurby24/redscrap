@@ -77,7 +77,7 @@ export class BossAZScraper extends HTMLScraper {
 				});
 				if (this.options.maxPages > 0) {
 					this.currentPage++;
-					let url = `https://en.boss.az/vacancies?page=${this.currentPage}`;
+					const url = `https://en.boss.az/vacancies?page=${this.currentPage}`;
 					await enqueueLinks({
 						urls: [url],
 						label: "main",
@@ -95,7 +95,7 @@ export class BossAZScraper extends HTMLScraper {
 
 				if (this.options.maxPages > 0) {
 					this.currentPage++;
-					let url = `https://en.boss.az/vacancies?page=${this.currentPage}`;
+					const url = `https://en.boss.az/vacancies?page=${this.currentPage}`;
 					await enqueueLinks({
 						urls: [url],
 						label: "main",

@@ -9,12 +9,14 @@
     "dotenv": "^16.4.7",
     "moment": "^2.30.1",
     "nanoid": "^5.0.9",
-    "postgres": "^3.4.5"
+    "postgres": "^3.4.5",
+    "turndown": "^7.2.0"
   },
   "devDependencies": {
     "@apify/tsconfig": "^0.1.0",
     "@biomejs/biome": "1.9.4",
     "@types/node": "^22.0.0",
+    "@types/turndown": "^5.0.5",
     "tsx": "^4.4.0",
     "typescript": "~5.7.0"
   },

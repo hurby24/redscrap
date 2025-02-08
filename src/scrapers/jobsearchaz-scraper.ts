@@ -1,6 +1,7 @@
 import { APIScraper } from "../base/api-scraper.ts";
 import { generateRandomId, createSlug } from "../utils/index.ts";
 import type { Job } from "../db/models/jobs.ts";
+import turndown from "turndown";
 import crypto from "node:crypto";
 import moment from "moment";
 export class JobSearchAZScraper extends APIScraper {
@@ -37,14 +38,15 @@ export class JobSearchAZScraper extends APIScraper {
 				.update(`${title}.${company}`)
 				.digest("hex");
 			const slug = createSlug(title);
-			const postedAt = moment(job.created_at).toISOString();
 			const categoryId = CategoryToId[job.category.title] || 18;
+			const description = HtmlToMd(job.text || "");
 			const companyLogo =
 				job.company.logo ||
 				job.company.logo_mini ||
 				`https://ui-avatars.com/api/?name=${company.charAt(
 					0,
 				)}&size=300&bold=true&background=random`;
+			const postedAt = moment(job.created_at).toISOString();
 			if (moment().diff(postedAt, "days") > 2) {
 				return;
 			}
@@ -57,7 +59,7 @@ export class JobSearchAZScraper extends APIScraper {
 				slug: `${slug}-${id}`,
 				url: `https://www.jobsearch.az/vacancies/${job.slug}`,
 				title,
-				description: job.text || null,
+				description: description,
 				salary: job.salary ? [job.salary] : null,
 				view_count: job.v_count,
 				source: "jobsearch-az",
@@ -65,7 +67,7 @@ export class JobSearchAZScraper extends APIScraper {
 				company_name: company,
 				company_logo: companyLogo,
 				location: job.company.address || null,
-				posted_at: moment(job.created_at).toISOString(),
+				posted_at: postedAt,
 				ends_at: moment(job.deadline_at).toISOString(),
 			};
 
@@ -127,4 +129,11 @@ const CategoryToId: Record<string, number> = {
 	"Construction and building": 15,
 	"Security, uniformed and protective services": 16,
 	"Performing arts and media": 17,
+};
+
+const HtmlToMd = (html: string): string => {
+	const cleanedHtml = html.replace(/[\n\t]+/g, " ").trim();
+
+	const turndownService = new turndown({ bulletListMarker: "-" });
+	return turndownService.turndown(cleanedHtml);
 };

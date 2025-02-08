@@ -46,7 +46,7 @@ export abstract class HTMLScraper {
 		} catch (e) {
 			console.error(e);
 		}
-		await sql.end();
+
 		return;
 	}
 

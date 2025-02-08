@@ -49,7 +49,6 @@ export abstract class APIScraper {
 		} catch (e) {
 			console.error(e);
 		}
-		await sql.end();
 		return;
 	}
 

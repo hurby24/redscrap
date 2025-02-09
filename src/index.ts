@@ -1,6 +1,7 @@
 import { JobSearchAZScraper } from "./scrapers/jobsearchaz-scraper.ts";
 import { BossAZScraper } from "./scrapers/bossaz-scraper.ts";
 import { HelloJobAZScraper } from "./scrapers/hellojobaz-scraper.ts";
+import { GlorriAZScraper } from "./scrapers/glorriaz-scraper.ts";
 import type { APIScraperOptions } from "./base/api-scraper.ts";
 import type { HTMLScraperOptions } from "./base/html-scraper.ts";
 import { ProxyConfiguration } from "crawlee";
@@ -32,13 +33,26 @@ let ApiOptions: APIScraperOptions = {
 	},
 	maxRequests: 62,
 	maxPages: 2,
-	maxRetries: 1,
+	maxRetries: 2,
 	proxyConfiguration: APIproxyConfiguration,
 };
 
 const JobSearchscraper = new JobSearchAZScraper(ApiOptions);
 await JobSearchscraper.start();
 await JobSearchscraper.saveJobs();
+
+//glorri.az
+ApiOptions = {
+	baseUrl: "",
+	maxRequests: 64,
+	maxPages: 3,
+	maxRetries: 2,
+	proxyConfiguration: APIproxyConfiguration,
+};
+
+const GlorriAZscraper = new GlorriAZScraper(ApiOptions);
+await GlorriAZscraper.start();
+await GlorriAZscraper.saveJobs();
 
 //boss.az
 let HtmlOptions: HTMLScraperOptions = {

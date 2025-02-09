@@ -5,6 +5,7 @@
   "description": "basic job board scraper for local jobs",
   "dependencies": {
     "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
     "crawlee": "^3.0.0",
     "dotenv": "^16.4.7",
     "moment": "^2.30.1",
